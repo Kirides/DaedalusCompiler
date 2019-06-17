@@ -4,7 +4,7 @@ Project is using internally ANTL4 for parsing source code.
 The compiler itself is written in .NET Core C#.
 You can listen about our compiler on below video. Video has bad audio quality, we encourage you to turn on subtitles, on the current moment we have subtitles for Polish, German and English
 
-![](screen_it_days.png | width=250)(http://www.youtube.com/watch?v=naPydcbJezw)
+[![](screen_it_days.png)](http://www.youtube.com/watch?v=naPydcbJezw)
 ## Download
 [Download](https://github.com/dzieje-khorinis/DaedalusCompiler/releases/latest) latest version of the tool
 ## Requirements
