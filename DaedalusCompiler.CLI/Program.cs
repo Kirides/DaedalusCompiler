@@ -8,7 +8,7 @@ using DaedalusCompiler.Compilation;
 using System.Diagnostics;
 using System.IO;
 
-namespace DaedalusCompiler
+namespace DaedalusCompiler.CLI
 {
     class Program
     {
@@ -30,7 +30,7 @@ namespace DaedalusCompiler
                 "--verbose"
             );
         }
-        
+
         static void HandleOptionsParser(string[] args)
         {
             var loadHelp = false;
@@ -40,7 +40,7 @@ namespace DaedalusCompiler
             var verbose = false;
             var getVersion = false;
 
-            var p = new NDesk.Options.OptionSet () {
+            var p = new NDesk.Options.OptionSet() {
                 { "h|?|help",   v => loadHelp = true },
                 { "load-dat", v => loadDat = true },
                 { "get-assembly", v => compileToAssembly = true },
@@ -50,11 +50,13 @@ namespace DaedalusCompiler
             };
 
             List<string> extra;
-            try {
-                extra = p.Parse (args);
+            try
+            {
+                extra = p.Parse(args);
             }
-            catch (NDesk.Options.OptionException e) {
-                Console.WriteLine (e.Message);
+            catch (NDesk.Options.OptionException e)
+            {
+                Console.WriteLine(e.Message);
                 return;
             }
 
@@ -64,7 +66,7 @@ namespace DaedalusCompiler
                 return;
             }
 
-            if ( loadHelp || extra.Count == 0 )
+            if (loadHelp || extra.Count == 0)
             {
                 ShowHelp();
             }
@@ -113,7 +115,13 @@ namespace DaedalusCompiler
 
         static void Main(string[] args)
         {
-            HandleOptionsParser(args);
+            var sw = Stopwatch.StartNew();
+            var res = Compiler.Parse(@"A:\Spiele\Gothic II_Mods\_work\Data\Scripts\Content\Ninja_ManaReg\_INTERN\test.D");
+            sw.Stop();
+            Console.WriteLine(sw.ElapsedMilliseconds);
+            // CompileDaedalus(@"A:\Spiele\Gothic II_Mods\_work\Data\Scripts\Content\Gothic.SRC", false, true, false);
+
+            // HandleOptionsParser(args);
         }
     }
 }
