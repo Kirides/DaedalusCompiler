@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text;
 using Antlr4.Runtime.Tree;
 using DaedalusCompiler.Dat;
+using System.Text.RegularExpressions;
 
 namespace DaedalusCompiler.Compilation
 {
-    public class Compiler
+    public partial class Compiler
     {
 
         private readonly AssemblyBuilder _assemblyBuilder;
@@ -30,6 +31,34 @@ namespace DaedalusCompiler.Compilation
             string programStartPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
 
             return Path.Combine(Path.GetDirectoryName(programStartPath), "DaedalusBuiltins");
+        }
+
+        public static List<SyntaxError> Parse(string filename)
+        {
+            var compiler = new Compiler(verbose: false);
+            return compiler.ParseFile(filename);
+        }
+        private List<SyntaxError> ParseFile(string filename)
+        {
+            string fileContent = GetFileContent(filename);
+            using (var sw = new StringWriter())
+            {
+                var errors = new List<SyntaxError>();
+                DaedalusParser parser = GetParserForText(fileContent, TextWriter.Null, sw);
+                var listener = new DaedalusBaseListener();
+                ParseTreeWalker.Default.Walk(new DaedalusBaseListener(), parser.daedalusFile());
+                var rxError = new Regex(@"line (\d+):(\d+) (.+)");
+                var errorMatches = rxError.Matches(sw.ToString());
+                foreach (Match e in errorMatches.Where(x => x.Success))
+                {
+                    errors.Add(new SyntaxError {
+                        Line = int.Parse(e.Groups[1].Value),
+                        Column = int.Parse(e.Groups[2].Value),
+                        Message = e.Groups[3].Value.TrimEnd()
+                    });
+                }
+                return errors; 
+            }
         }
 
         public bool CompileFromSrc(
@@ -170,6 +199,14 @@ namespace DaedalusCompiler.Compilation
             DaedalusLexer lexer = new DaedalusLexer(inputStream);
             CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
             return new DaedalusParser(commonTokenStream);
+        }
+
+        private DaedalusParser GetParserForText(string input, TextWriter output, TextWriter errorOutput)
+        {
+            AntlrInputStream inputStream = new AntlrInputStream(input);
+            DaedalusLexer lexer = new DaedalusLexer(inputStream, output, errorOutput);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            return new DaedalusParser(commonTokenStream, output, errorOutput);
         }
 
         private DaedalusParser GetParserForScriptsFile(string scriptFilePath)
