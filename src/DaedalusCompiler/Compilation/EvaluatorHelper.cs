@@ -113,7 +113,14 @@ namespace DaedalusCompiler.Compilation
 
             // value is simple literal
             if (valueChild is TerminalNodeImpl)
-                return int.Parse(valueChild.GetText());
+            {
+                var val = long.Parse(valueChild.GetText());
+                if(val <= int.MaxValue+1L)
+                {
+                    return (int)val;
+                }
+                throw new Exception($"Value too large for an integer '{value.GetText()}'");
+            }
 
             // value is reference to other constant
             if (valueChild is DaedalusParser.ReferenceContext reference)
