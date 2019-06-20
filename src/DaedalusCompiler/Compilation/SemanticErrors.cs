@@ -146,7 +146,7 @@ namespace DaedalusCompiler.Compilation
         protected string GetErrorPointerLine(int whitespaceCount)
         {
             string errorPointerLine = "";
-            for (int i = 0; i < whitespaceCount; i++)
+            for (int i = 0; i < whitespaceCount && i < _line.Length; i++)
             {
                 if (_line[i] == '\t')
                 {
